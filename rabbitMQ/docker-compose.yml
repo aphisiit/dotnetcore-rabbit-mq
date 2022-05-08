@@ -1,0 +1,32 @@
+﻿version: "3.8"
+services:
+    rabbitmq3:
+        container_name: "rabbitmq"
+        image: rabbitmq:3.10-management-alpine
+        environment:
+            - RABBITMQ_DEFAULT_USER=admin
+            - RABBITMQ_DEFAULT_PASS=admin
+        ports:
+            # AMQP protocol port
+            - '5672:5672'
+            # HTTP management UI
+            - '15672:15672'
+        networks: 
+            - rabbit-net
+
+    rabbit-api:
+        container_name: "rabbit-api"
+        image: dotnetcore-rabbit-mq
+        environment:
+            - RABBIT_HOSTNAME=rabbitmq
+            - RABBIT_USERNAME=admin
+            - RABBIT_PASSWORD=admin
+            - DATABASE_PATH=/opt/rabbitMQ/publish/sqliteDB/Order.db
+        ports:
+            - '8080:8080'
+        networks: 
+            - rabbit-net
+
+networks:
+  rabbit-net:
+    driver: bridge
