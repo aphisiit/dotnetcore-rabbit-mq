@@ -1,4 +1,7 @@
 # .NET Standard (.NET 8) and RabbitMQ
+
+![image info](./images/Diagram.png)
+
 This application start with port 8080.
 
 ### Build application
