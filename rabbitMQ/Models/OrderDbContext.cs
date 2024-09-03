@@ -12,6 +12,6 @@ namespace rabbitMQ.Models
 		}
 
 		protected override void OnConfiguring(DbContextOptionsBuilder options)
-			=> options.UseSqlite($"Data Source=/Users/aphisitnamracha/Projects/rabbitMQ/rabbitMQ/sqliteDB/Order.db");
+			=> options.UseSqlite($"Data Source=/opt/rabbitMQ/sqliteDB/Order.db");
 	}
 }
