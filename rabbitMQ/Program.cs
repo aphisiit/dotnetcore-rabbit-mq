@@ -1,39 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Net.Http;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Extensions.Http;
+using rabbitMQ.Producer.RabbitMQ;
 
-namespace rabbitMQ
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddProblemDetails();
+builder.Services.AddControllers();
+builder.Services.AddHostedService<RabbitMQConsumer>();
+builder.Services.AddScoped<IMessageProducer, RabbitMQProducer>();
+builder.Services.AddHttpClient<IMessageProducer, RabbitMQProducer>()
+	.SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Set lifetime to five minutes
+	.AddPolicyHandler(GetRetryPolicy());
+
+var app = builder.Build();
+
+app.UseStatusCodePages();
+app.UseExceptionHandler();
+
+if(app.Environment.IsDevelopment())
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
-			CreateHostBuilder(args).Build().Run();
-		}
+	app.UseSwagger();
+	app.UseSwaggerUI();
+}
 
-		//public static IHostBuilder CreateHostBuilder(string[] args) =>
-		//	Host.CreateDefaultBuilder(args)
-		//		.ConfigureLogging(logging =>
-		//		{
-		//			logging.ClearProviders();
-		//			logging.AddConsole();
-		//		})
-		//		.ConfigureWebHostDefaults(webBuilder =>
-		//		{
-		//			webBuilder.UseStartup<Startup>();
-		//		});
+app.UseHttpsRedirection();
+app.UseRouting();
+app.MapControllers();
 
-		public static IHostBuilder CreateHostBuilder(string[] args) =>
-			Host.CreateDefaultBuilder(args)
-			.ConfigureWebHostDefaults(webBuilder =>
-			{
-				webBuilder.UseStartup<Startup>();
-				webBuilder.UseUrls("http://*:8080");
-			});
-	}
+app.Run();
+
+IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+	return HttpPolicyExtensions
+		.HandleTransientHttpError()
+		.OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+		.OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
+		.OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+		.OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.GatewayTimeout)
+		.OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.BadGateway)
+		.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(10));
 }
