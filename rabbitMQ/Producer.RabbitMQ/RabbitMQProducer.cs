@@ -24,7 +24,7 @@ namespace rabbitMQ.Producer.RabbitMQ
 
 		public void SendMessage<T>(T message)
 		{
-			string rabbitMQHostName = "localhost";
+			string rabbitMQHostName = "rabbitmq3";
 			string rabbitUsername = "admin";
 			string rabbitPassword = "admin";
 
@@ -38,35 +38,22 @@ namespace rabbitMQ.Producer.RabbitMQ
 			var body = Encoding.UTF8.GetBytes(json);
 			channel.BasicPublish(exchange: "", routingKey: "orders", basicProperties: null, body: body);
 
-			var consumer = new EventingBasicConsumer(channel);
-			consumer.Received += (model, eventArgs) =>
-			{
-				var body = eventArgs.Body.ToArray();
-				//Console.WriteLine($"body: {body}");
-				var message = Encoding.UTF8.GetString(body);
-				//Console.WriteLine($"message: {message}");
-				_logger.LogInformation($"message: {message}");
-				//httpClient.Post
-			};
+			// var consumer = new EventingBasicConsumer(channel);
+			// consumer.Received += (model, eventArgs) =>
+			// {
+			// 	var body = eventArgs.Body.ToArray();
+			// 	//Console.WriteLine($"body: {body}");
+			// 	var message = Encoding.UTF8.GetString(body);
+			// 	//Console.WriteLine($"message: {message}");
+			// 	_logger.LogInformation($"message: {message}");
+			// 	//httpClient.Post
+			// };
 
-			channel.BasicConsume(queue: "orders", autoAck: true, consumer: consumer);
-			Console.ReadKey();
+			// channel.BasicConsume(queue: "orders", autoAck: true, consumer: consumer);
+			// // Console.ReadKey();
 
-			//connection.Close();
-			//connection.Dispose();
-		}
-
-		public async Task<string> ReceviedMessage()
-		{
-			var stringTask = "";
-			try
-			{
-				stringTask = await httpClient.GetStringAsync("https://api.github.com/orgs/dotnet/reposs");
-			} catch (Exception e)
-			{
-				_logger.LogError($"error - {e.Message}");
-			}
-			return stringTask;
-		}
+			connection.Close();
+			connection.Dispose();
+		}	
 	}
 }
