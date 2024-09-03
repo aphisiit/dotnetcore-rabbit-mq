@@ -1,17 +1,17 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:5.0.408 AS builder
+﻿FROM mcr.microsoft.com/dotnet/sdk:6.0.425 AS builder
 USER root
 WORKDIR /opt/rabbitMQ
 COPY . ./
 
 RUN ["dotnet", "publish", "rabbitMQ.csproj",  "-c", "Release"]
-RUN ["dotnet", "tool", "install", "--global", "dotnet-ef", "--version", "5.0.17"]
+RUN ["dotnet", "tool", "install", "--global", "dotnet-ef", "--version", "6.0.33"]
 
 ENV PATH $PATH:/root/.dotnet/tools
 
 RUN ["dotnet", "ef", "migrations", "add", "InitialCreate_docker"]
 RUN ["dotnet", "ef", "database", "update"]
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0.17
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.33
 
 # Add dotnet core env for enable swagger 
 ENV ASPNETCORE_ENVIRONMENT Development
@@ -26,7 +26,7 @@ WORKDIR /opt/rabbitMQ
 
 EXPOSE 8080
 
-COPY --from=builder /opt/rabbitMQ/bin/Release/net5.0/publish .
+COPY --from=builder /opt/rabbitMQ/bin/Release/net6.0/publish .
 COPY --from=builder /opt/rabbitMQ/sqliteDB sqliteDB
 
 # RUN ["dotnet", "tool", "install", "--global", "dotnet-ef"]
