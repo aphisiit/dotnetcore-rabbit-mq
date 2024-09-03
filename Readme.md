@@ -1,4 +1,4 @@
-# dotnet-core and rabbit-mq
+# .NET Standard (.NET 6) and RabbitMQ
 This application start with port 8080.
 
 ### Build application
@@ -8,10 +8,10 @@ $ dotnet build
 
 ### Start application
 ```sh
-$ dotnet run
+$ dotnet run --project rabbitMQ
 ```
 
 ### Publish Release
 ```sh
-$ dotnet public -c Release
+$ dotnet publish -c Release
 ```
