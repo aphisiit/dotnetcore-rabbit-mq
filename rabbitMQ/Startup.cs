@@ -28,7 +28,7 @@ namespace rabbitMQ
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-
+			services.AddSwaggerGen();
 			services.AddControllers();
 			services.AddHostedService<RabbitMQConsumer>();
 			services.AddScoped<IMessageProducer, RabbitMQProducer>();
@@ -44,6 +44,8 @@ namespace rabbitMQ
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
+				app.UseSwagger();
+				app.UseSwaggerUI();
 			}
 
 			app.UseRouting();
