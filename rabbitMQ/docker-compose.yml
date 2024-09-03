@@ -1,5 +1,4 @@
-﻿version: "3.8"
-services:
+﻿services:
     rabbitmq3:
         container_name: "rabbitmq"
         image: rabbitmq:3.10-management-alpine
@@ -16,12 +15,14 @@ services:
 
     rabbit-api:
         container_name: "rabbit-api"
-        image: dotnetcore-rabbit-mq
+        build:
+            context: .
+            dockerfile: Dockerfile
         environment:
             - RABBIT_HOSTNAME=rabbitmq
             - RABBIT_USERNAME=admin
             - RABBIT_PASSWORD=admin
-            - DATABASE_PATH=/opt/rabbitMQ/publish/sqliteDB/Order.db
+            - DATABASE_PATH=/opt/rabbitMQ/sqliteDB/Order.db
         ports:
             - '8080:8080'
         networks: 

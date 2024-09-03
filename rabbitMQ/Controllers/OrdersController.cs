@@ -13,7 +13,7 @@ namespace rabbitMQ.Controllers
 	{
 		private readonly OrderDbContext _context;
 		private readonly IMessageProducer _messagePublisher;
-
+		
 		public OrdersController(IMessageProducer messagePublisher)
 		{
 			_context = new OrderDbContext();
@@ -34,14 +34,6 @@ namespace rabbitMQ.Controllers
 			await _context.SaveChangesAsync();
 			_messagePublisher.SendMessage(order);
 			return Ok(new { id = order.Id });
-		}
-
-		[HttpGet, Produces("application/json")]
-		public async Task<IActionResult> ReceivedOrder()
-		{
-			string result = await _messagePublisher.ReceviedMessage();
-
-			return Ok(result);
-		}
+		}		
 	}
 }

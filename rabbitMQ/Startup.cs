@@ -30,6 +30,7 @@ namespace rabbitMQ
 		{
 
 			services.AddControllers();
+			services.AddHostedService<RabbitMQConsumer>();
 			services.AddScoped<IMessageProducer, RabbitMQProducer>();
 			services.AddHttpClient<IMessageProducer, RabbitMQProducer>()
 				.SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Set lifetime to five minutes
